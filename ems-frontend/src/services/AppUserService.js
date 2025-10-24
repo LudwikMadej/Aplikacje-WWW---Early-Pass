@@ -1,6 +1,6 @@
-import axios from "axios";
 import axiosConfig from "../axiosConfig.js";
 
+//const REST_API_BASE_URL = 'http://ems-backend:8080/api/users'
 const REST_API_BASE_URL = 'http://localhost:8080/api/users'
 
 export const listAppUsers = () => {

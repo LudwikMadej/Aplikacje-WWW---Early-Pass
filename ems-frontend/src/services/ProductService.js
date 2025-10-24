@@ -1,6 +1,6 @@
-import axios from "axios";
 import axiosInstance from "../axiosConfig.js";
 
+//const REST_API_BASE_URL = 'http://ems-backend:8080/api/products'
 const REST_API_BASE_URL = 'http://localhost:8080/api/products'
 
 export const listProducts = () => {

@@ -3,7 +3,6 @@ version: '3.9'
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ems-sqlserver
     environment:
       SA_PASSWORD: "StrongPass123"
       ACCEPT_EULA: "Y"
@@ -11,9 +10,16 @@ services:
       - "1500:1433"
     volumes:
       - ./sql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "timeout 5 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P StrongPass123 -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      retries: 10
+      start_period: 30s
 
   backend:
-    image: ems-backend
+    build:
+      context: ./ems-backend
+      dockerfile: Dockerfile
     container_name: ems-backend
     ports:
       - "8080:8080"
@@ -21,11 +27,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=master;encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: StrongPass123
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
-    image: ems-frontend
+    build:
+      context: ./ems-frontend
+      dockerfile: Dockerfile
     container_name: ems-frontend
     ports:
       - "3000:3000"
     environment:
       REACT_APP_API_URL: http://localhost:8080
+    depends_on:
+      - backend

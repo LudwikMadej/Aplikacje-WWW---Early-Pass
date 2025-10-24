@@ -10,4 +10,8 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+ENTRYPOINT ["/wait-for-it.sh", "db:1433", "--", "java", "-jar", "app.jar"]
